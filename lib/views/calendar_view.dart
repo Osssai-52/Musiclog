@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:musiclog/views/widgets/diary_detail_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:collection/collection.dart';
 import 'package:musiclog/config/app_colors.dart';
@@ -162,7 +163,12 @@ class _CalendarViewState extends State<CalendarView> {
 
                       if (diaryEntry != null) {
                         return Center(
-                          child: ClipOval(
+                          child: GestureDetector(
+                            onTap: (){
+                              showDialog(context: context,
+                                  builder:(context) => DiaryDetailDialog(diaryEntry: diaryEntry, songRepository: widget.songRepository,),
+                              );
+                            },
                             child: FutureBuilder<String?>(
                               future: _getSongImageUrl(diaryEntry.recommendation?.songId),
                               builder: (context, imageSnapshot) {
@@ -191,34 +197,47 @@ class _CalendarViewState extends State<CalendarView> {
 
                                 final imageUrl = imageSnapshot.data;
                                 if (imageUrl != null) {
-                                  return Image.network(
-                                    imageUrl,
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppColors.primary,
+                                  return ClipOval(
+                                    clipBehavior: Clip.hardEdge,
+                                    child: SizedBox(
+                                      width: 40,
+                                      height: 40,
+                                      child: OverflowBox(
+                                        alignment: Alignment.center,
+                                        maxWidth: 42,  // ← 이미지는 60x60으로
+                                        maxHeight: 42,
+                                        child: Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.cover,
+                                          width: 60,
+                                          height: 60,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: AppColors.primary,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  '${day.day}',
+                                                  style: TextStyle(
+                                                    fontFamily: "Nanum",
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            '${day.day}',
-                                            style: TextStyle(
-                                              fontFamily: "Nanum",
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                      ),
+                                    ),
                                   );
                                 }
+
 
                                 // 노래 없으면 숫자 표시
                                 return Container(
@@ -245,7 +264,6 @@ class _CalendarViewState extends State<CalendarView> {
                           ),
                         );
                       }
-
                       return null;
                     },
                   ),
@@ -278,7 +296,7 @@ class _CalendarViewState extends State<CalendarView> {
                       fontFamily: "Nanum",
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: AppColors.textPrimary,
                     ),
                     outsideDaysVisible: false,
                   ),

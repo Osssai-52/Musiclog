@@ -91,7 +91,6 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Stack(
           children: [
-            // ✅ AnimatedSwitcher로 부드러운 페이드 전환
             AnimatedSwitcher(
               duration: Duration(milliseconds: 250),
               transitionBuilder: (child, animation) =>

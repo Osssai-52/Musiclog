@@ -23,6 +23,8 @@ class DummySongCatalogRepository implements SongCatalogRepository {
           album: song['album'] as String?,
           year: song['year'] as int?,
           coverUrl: song['coverUrl'] as String?,
+          appleMusicUrl: song['appleMusicUrl'] as String?,  // ← 추가
+          previewUrl: song['previewUrl'] as String?,        // ← 추가
           lyricsSnippet: song['lyricsSnippet'] as String?,
           lyricsFull: song['lyricsFull'] as String?,
         )),

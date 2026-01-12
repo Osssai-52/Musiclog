@@ -11,6 +11,9 @@ class Song{
   final String? lyricsFull;
   final String? lyricsSnippet;
 
+  final String? appleMusicUrl;
+  final String? previewUrl;
+
   Song({
     required this.id,
     required this.title,
@@ -21,5 +24,7 @@ class Song{
     this.coverLocalPath,
     this.lyricsFull,
     this.lyricsSnippet,
+    this.appleMusicUrl,
+    this.previewUrl,
   });
 }

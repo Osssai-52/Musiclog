@@ -3,6 +3,7 @@ import 'package:musiclog/config/app_colors.dart';
 import 'package:musiclog/domain/repositories/diary_repository.dart';
 import 'package:musiclog/domain/repositories/song_catalog_repository.dart';
 import 'package:musiclog/views/utils/diary_grouper.dart';
+import 'package:musiclog/views/widgets/diary_detail_dialog.dart';
 
 import '../domain/models/diary_entry.dart';
 import '../domain/models/song.dart';
@@ -158,7 +159,10 @@ class _DiaryListViewState extends State<DiaryListView> {
                           size: 24,
                         )
                             : null,
-                        onTap: null,
+                        onTap: () {
+                          showDialog(context: context,
+                              builder: (context) => DiaryDetailDialog(diaryEntry: entry, songRepository: widget.songRepository));
+                        },
                       ),
                     ),
                   );

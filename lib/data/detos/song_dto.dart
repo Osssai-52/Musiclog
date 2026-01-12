@@ -2,21 +2,21 @@ class SongDto {
     final String id;
     final String title;
     final String artist;
-    final String lyricsFull;
+    final String? lyricsFull; // 가사는 보통 없음 → nullable
 
     SongDto({
         required this.id,
         required this.title,
         required this.artist,
-        required this.lyricsFull,
+        this.lyricsFull,
     });
 
     factory SongDto.fromJson(Map<String, dynamic> json) {
         return SongDto(
-            id: json['id'] as String,
-            title: json['title'] as String,
-            artist: json['artist'] as String,
-            lyricsFull: json['lyricsFull'] as String,
+        id: json['id']?.toString() ?? '',
+        title: json['title']?.toString() ?? '',
+        artist: json['artist']?.toString() ?? '',
+        lyricsFull: json['lyricsFull']?.toString(),
         );
     }
 }

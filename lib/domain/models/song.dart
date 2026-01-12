@@ -1,4 +1,4 @@
-class Song {
+/*class Song {
     final String id;
     final String title;
     final String artist;
@@ -10,4 +10,20 @@ class Song {
         required this.artist,
         required this.lyricsFull,
     });
+}*/
+
+
+class Song {
+    final String id;
+    final String title;
+    final String artist;
+    final String lyrics;
+
+    Song({
+        required this.id,
+        required this.title,
+        required this.artist,
+        required this.lyrics,
+    });
 }
+

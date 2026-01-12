@@ -56,3 +56,16 @@ analysis_benchmark.json
 .pub/
 
 app.*.symbols
+
+# Flutter/Dart
+.dart_tool/
+build/
+.pub/
+.packages
+
+# Android/iOS build artifacts
+*.apk
+*.aab
+android/.gradle/
+ios/Pods/
+ios/.symlinks/

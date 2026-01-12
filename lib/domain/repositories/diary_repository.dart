@@ -1,16 +1,17 @@
-import '../models/diary_entry.dart';
+import 'package:musiclog/domain/models/diary_entry.dart';
+import 'package:musiclog/domain/models/recommendation_result.dart';
 
 abstract class DiaryRepository {
-    Future<DiaryEntry?> getByDate(DateTime date);
-    Future<List<DiaryEntry>> listAll({bool newestFirst = true});
+  Future<DiaryEntry?> getByDate(DateTime date);
+  Future<List<DiaryEntry>> listAll({bool newestFirst = true});
 
-    Future<DiaryEntry> upsetForDate({
-        required DateTime date,
-        required String content,
-    });
+  Future<DiaryEntry> upsertForDate({
+    required DateTime date,
+    required String content,
+  });
 
-    Future<void> attachRecommendation({
-        required String diaryEntryId,
-        required RecommendationResult recommendation,
-    });
+  Future<void> attachRecommendation({
+    required String diaryEntryId,
+    required RecommendationResult recommendation,
+  });
 }

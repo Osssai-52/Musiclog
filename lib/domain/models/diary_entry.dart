@@ -6,6 +6,7 @@ class DiaryEntry {
     final DateTime updatedAt;
 
     final String? recommendedSongId;
+    final RecommendationResult? recommendation;
 
     DiaryEntry({
         required this.id,

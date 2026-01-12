@@ -1,59 +1,54 @@
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:musiclog/domain/repositories/song_catalog_repository.dart';
-
 import '../../domain/models/song.dart';
 
-class DummySongCatalogRepository implements SongCatalogRepository{
+class DummySongCatalogRepository implements SongCatalogRepository {
   bool _inited = false;
-
-  final List<Song> _songs = [
-    Song(
-      id: 's1',
-      title: 'Blinding Lights',
-      artist: 'The Weeknd',
-      album: 'After Hours',
-      year: 2019,
-      coverUrl: 'https://picsum.photos/300?1',
-      lyricsSnippet: 'I said, ooh, I\'m blinded by the lights...',
-    ),
-    Song(
-      id: 's2',
-      title: 'Shape of You',
-      artist: 'Ed Sheeran',
-      album: '÷ (Divide)',
-      year: 2017,
-      coverUrl: 'https://picsum.photos/300?2',
-      lyricsSnippet: 'I\'m in love with the shape of you...',
-    ),
-    Song(
-      id: 's3',
-      title: 'Someone Like You',
-      artist: 'Adele',
-      album: '21',
-      year: 2011,
-      coverUrl: 'https://picsum.photos/300?3',
-      lyricsSnippet: 'Never mind, I\'ll find someone like you...',
-    ),
-  ];
+  final List<Song> _songs = [];
 
   @override
   Future<void> init() async {
-    _inited = true;
+    try {
+      // assets/songs.json 파일 로드
+      final jsonString = await rootBundle.loadString('assets/songs.json');
+      final jsonData = jsonDecode(jsonString) as Map<String, dynamic>;
+      final songsList = jsonData['data'] as List<dynamic>;
+
+      _songs.addAll(
+        songsList.map((song) => Song(
+          id: song['id'] as String,
+          title: song['title'] as String,
+          artist: song['artist'] as String,
+          album: song['album'] as String?,
+          year: song['year'] as int?,
+          coverUrl: song['coverUrl'] as String?,
+          lyricsSnippet: song['lyricsSnippet'] as String?,
+          lyricsFull: song['lyricsFull'] as String?,
+        )),
+      );
+
+      _inited = true;
+    } catch (e) {
+      print('Error loading songs: $e');
+      _inited = true; // 에러 발생해도 계속 진행
+    }
   }
 
   void _ensureInit() {
-    if(!_inited){
+    if (!_inited) {
       throw StateError('SongCatalogRepository.init() must be called first');
     }
   }
 
   @override
   Future<Song?> getById(String id) async {
-    _ensureInit()
-        try {
-          return _songs.firstWhere((s) => s.id == id);
-        } catch (_) {
-          return null;
-        }
+    _ensureInit();
+    try {
+      return _songs.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

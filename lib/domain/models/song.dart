@@ -1,5 +1,5 @@
 class Song{
-  final String id;
+  final String id; //ISRC id
   final String title;
   final String artist;
   final String? album;

@@ -4,6 +4,8 @@ class RecommendationResult {
     final String reason;
     final List<String> matchedLines;
     final DateTime generatedAt;
+    final String model;
+    final double? confidence;
 
     RecommendationResult({
         required this.diaryEntryId,
@@ -11,5 +13,7 @@ class RecommendationResult {
         required this.reason,
         required this.matchedLines,
         required this.generatedAt,
+        required this.model,
+        this.confidence,
     });
 }

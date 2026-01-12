@@ -11,17 +11,14 @@ import '../domain/models/song.dart';
 class DiaryListView extends StatefulWidget {
   final SongCatalogRepository songRepository;
   final DiaryRepository diaryRepository;
-
   const DiaryListView({
     super.key,
     required this.songRepository,
     required this.diaryRepository,
   });
-
   @override
   State<DiaryListView> createState() => _DiaryListViewState();
 }
-
 class _DiaryListViewState extends State<DiaryListView> {
   late Future<List<DiaryEntry>> _diaryFuture;
 
@@ -135,7 +132,6 @@ class _DiaryListViewState extends State<DiaryListView> {
                                 ),
                               );
                             }
-
                             return Text(
                               'Unable to find Songs',
                               style: TextStyle(
@@ -161,7 +157,8 @@ class _DiaryListViewState extends State<DiaryListView> {
                             : null,
                         onTap: () {
                           showDialog(context: context,
-                              builder: (context) => DiaryDetailDialog(diaryEntry: entry, songRepository: widget.songRepository));
+                              builder: (context) => DiaryDetailDialog(diaryEntry: entry, songRepository: widget.songRepository)
+                          );
                         },
                       ),
                     ),

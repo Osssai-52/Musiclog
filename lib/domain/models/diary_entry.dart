@@ -1,0 +1,18 @@
+class DiaryEntry {
+    final String id;
+    final DateTime date;
+    final String content;
+    final DateTime createdAt;
+    final DateTime updatedAt;
+
+    final String? recommendedSongId;
+
+    DiaryEntry({
+        required this.id,
+        required this.date,
+        required this.content,
+        required this.createdAt,
+        required this.updatedAt,
+        this.recommendedSongId,
+    });
+}

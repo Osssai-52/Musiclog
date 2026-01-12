@@ -1,14 +1,21 @@
 import '../../domain/models/song.dart';
-import '../detos/song_dto.dart';
+import '../dtos/song_dto.dart';
 
 extension SongDtoMapper on SongDto {
-    Song toDomain() {
-        return Song(
-            id: id,
-            title: title,
-            artist: artist,
-            lyrics: lyricsFull ?? '',
-        );
-    }
+Song toDomain() {
+  return Song(
+    id: id,
+    title: title,
+    artist: artist,
+    album: album,
+    year: year,
+    coverUrl: coverUrl,
+    coverLocalPath: coverLocalPath,
+    lyricsFull: lyricsFull,
+    lyricsSnippet: lyricsSnippet,
+    appleMusicUrl: appleMusicUrl,
+    previewUrl: previewUrl,
+  );
+}
 }
 

@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'config/app_theme_controller.dart';
 import 'data/repositories/used_songs_repository_prefs.dart';
 import 'package:musiclog/views/insights_view.dart';
 
@@ -30,7 +31,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
-
+  final AppThemeController _themeController = AppThemeController();
   AppDependencies? _dependencies;
   bool _depsReady = false;
 
@@ -186,6 +187,15 @@ class _MyAppState extends State<MyApp> {
     await Share.shareXFiles([XFile(file.path)], text: 'MusicLog markdown export');
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _themeController.load().then((_) {
+      if (mounted) setState(() {});
+    });
+    _bootstrap();
+  }
+
   Future<void> _bootstrap() async {
     try {
       await songRepository.init();
@@ -310,19 +320,37 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (!_depsReady || _dependencies == null) {
-      return MaterialApp(
-        navigatorKey: _navKey,
-        title: 'Music Log',
-        debugShowCheckedModeBanner: false,
-        theme: _theme(),
-        home: const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-      );
-    }
 
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: _themeController.notifier,
+      builder: (context, themeState, _) {
+        final ready = _depsReady && _dependencies != null;
+
+        return MaterialApp(
+          navigatorKey: _navKey,
+          title: 'Music Log',
+          debugShowCheckedModeBanner: false,
+          themeMode: themeState.themeMode,
+          theme: _buildTheme(themeState, Brightness.light),
+          darkTheme: _buildTheme(themeState, Brightness.dark),
+          builder: (context, child) {
+            final mq = MediaQuery.of(context);
+            return MediaQuery(
+              data: mq.copyWith(textScaler: TextScaler.linear(themeState.textScale)),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+          home: ready
+              ? _buildHomeScaffold()
+              : const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
+        );
+      },
+    );
+  }
     final deps = _dependencies!;
 
     final tabs = <Widget>[

@@ -21,28 +21,56 @@ class OpenAiRecommendService implements RecommendService {
         required RecommendRequest request,
     }) async {
         final prompt = _buildPrompt(
-        diaryText: request.diaryText,
-        catalog: request.catalog,
-        excludedSongIds: request.excludedSongIds.toList(),
-        mood: request.mood,
+            diaryText: request.diaryText,
+            catalog: request.catalog,
+            excludedSongIds: request.excludedSongIds.toList(),
         );
 
         final responseJson = await _callGptApi(prompt);
 
+        final String matchedEmotion =
+            (responseJson['emotionKeyword'] as String?) ??
+            ((responseJson['emotions'] is List && (responseJson['emotions'] as List).isNotEmpty)
+                ? (responseJson['emotions'][0] as String?)
+                : null) ??
+            '감정 분석 실패';
+
+        final double confidence =
+            (responseJson['confidence'] is num)
+                ? (responseJson['confidence'] as num).toDouble()
+                : 0.5; // fallback
+
         final songId = responseJson['songId'] as String?;
-        if (songId == null || !request.catalog.any((s) => s.id == songId)) {
-        throw Exception('GPT returned invalid songId: $songId');
+
+        if (songId == null) {
+            throw Exception('GPT did not return songId');
         }
 
+        if (songId == 'NONE') {
+            return RecommendationResult(
+                diaryEntryId: diaryEntryId,
+                songId: 'NONE',
+                reason: responseJson['reason'] as String? ?? '추천할 수 있는 곡이 없습니다.',
+                matchedLines: [matchedEmotion],
+                generatedAt: DateTime.now(),
+                model: 'gpt-4o-mini',
+                confidence: confidence,
+            );
+        }
+
+        if (!request.catalog.any((s) => s.id == songId)) {
+            throw Exception('GPT returned invalid songId: $songId');
+        }
+
+
         return RecommendationResult(
-        diaryEntryId: diaryEntryId,
-        songId: songId,
-        reason: responseJson['reason'] as String? ?? '추천 이유를 생성할 수 없습니다.',
-        matchedLines: [
-            responseJson['matchedEmotion'] as String? ?? '감정 분석 실패'
-        ],
-        generatedAt: DateTime.now(),
-        model: 'gpt-4o-mini',
+            diaryEntryId: diaryEntryId,
+            songId: songId,
+            reason: responseJson['reason'] as String? ?? '추천 이유를 생성할 수 없습니다.',
+            matchedLines: [matchedEmotion],
+            generatedAt: DateTime.now(),
+            model: 'gpt-4o-mini',
+            confidence: confidence,
         );
     }
 
@@ -53,44 +81,51 @@ class OpenAiRecommendService implements RecommendService {
         required String diaryText,
         required List<Song> catalog,
         required List<String> excludedSongIds,
-        String? mood,
     }) {
         final availableSongs = catalog
             .where((s) => !excludedSongIds.contains(s.id))
-            .map((s) => '- id: ${s.id}, title: ${s.title}, artist: ${s.artist}')
+            .map((s) => '- id: ${s.id}, title: ${s.title}, artist: ${s.artist}, lyricsFull: ${s.lyricsFull}')
             .join('\n');
 
-        final moodSection = mood != null && mood.isNotEmpty
-            ? '[사용자가 선택한 감정]\n$mood'
-            : '';
-
         return '''
-    너는 사용자의 일기를 분석해 감정에 어울리는 노래를 추천하는 AI다.
-    반드시 아래 노래 목록 안에서만 선택해야 한다.
+    You are an AI that analyzes a user’s diary, infers the emotions and overall mood expressed in the writing on its own, and recommends a song that best fits those emotions.
 
-    [일기]
+    [Diary]
     """
     $diaryText
     """
-    $moodSection
 
-    [노래 목록]
+    [Song List]
     $availableSongs
 
-    [응답 규칙]
-    - 반드시 하나의 노래만 선택
-    - 이유는 한국어로 1~2문장
-    - 아래 JSON 형식으로만 응답
-    - 위 목록에 없는 songId를 반환하면 시스템 오류가 발생한다
-    - 반드시 목록에 존재하는 songId 중 하나만 선택해라
-    - 선택할 수 없으면 "NONE"을 반환해라
+    [Tasks]
+    1. Infer up to two primary emotions that are most strongly expressed in the diary.
+    2. Select one keyword that best represents today’s overall emotion.
+    3. Choose one song from the list that best matches the inferred emotions and mood.
 
+    [Response Rules]
+    - You must select a songId that exists in the provided song list only.
+    - Only one song is allowed.
+    - If no suitable song can be selected, return "NONE" as the songId.
+    - Mention the song title first, then provide the recommendation reason in Korean in 1–2 sentences.
+    - Do not provide counseling, solutions, or comforting messages.
+    - Minimize expressions of empathy and focus on musical aspects.
+    - Respond strictly in the JSON format specified below.
+    - Do not output any text outside of the JSON.
+    - Returning a songId that does not exist in the list will cause a system error.
+    - Focus primarily on the diary’s emotions. Use song information only to match musical mood and tone.
+    - confidence must be a number between 0.0 and 1.0.
+    - The score represents how confidently the song matches the diary’s emotions and overall mood.
 
+    [Output Format]
     {
+    "emotions": ["string", "string"],
+    "emotionKeyword": "string",
     "songId": "string",
     "reason": "string",
-    "matchedEmotion": "string"
+    "confidence": 0.0
     }
+
     ''';
     }
 
@@ -109,14 +144,14 @@ class OpenAiRecommendService implements RecommendService {
             'messages': [
             {
                 'role': 'system',
-                'content': '너는 감정 기반 음악 추천 AI다.',
+                'content': 'You are an emotion-based music recommendation AI.',
             },
             {
                 'role': 'user',
                 'content': prompt,
             },
             ],
-            'temperature': 0.7,
+            'temperature': 0.5,
         }),
         );
 

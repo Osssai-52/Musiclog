@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'di/app_dependencies.dart';
-import 'domain/models/song.dart'; // Song 모델 import 확인 필요
+import 'domain/models/song.dart'; 
 
 void main() {
   final dependencies = AppDependencies();
@@ -41,20 +41,17 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       _isLoading = true;
-      _resultText = "AI가 카탈로그 내에서 적절한 곡을 찾는 중입니다...";
+      _resultText = "Musiclog가 목록 내에서 적절한 곡을 찾는 중입니다...";
     });
 
     try {
-      // 1. 추천 로직 실행 (결과로 songId를 받아옴)
       final result = await widget.dependencies.recommendSongUseCase.execute(
         diaryEntryId: 'test-diary-${DateTime.now().millisecondsSinceEpoch}',
         diaryText: _controller.text,
       );
 
-      // 2. 곡 목록(Catalog)에서 추천된 ID와 일치하는 실제 곡 정보 찾기
       final allSongs = await widget.dependencies.songCatalogRepository.getTopSongs();
-      
-      // AI가 준 ID와 일치하는 곡 검색
+
       Song? recommendedSong;
       try {
         recommendedSong = allSongs.firstWhere((s) => s.id == result.songId);
@@ -64,16 +61,14 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         if (recommendedSong != null) {
-          // 목록에 있는 곡을 정상적으로 추천했을 때
           _resultText = "🎵 추천 곡: ${recommendedSong.title}\n"
                         "👤 아티스트: ${recommendedSong.artist}\n"
                         "🆔 곡 ID: ${result.songId}\n\n"
                         "📝 추천 이유:\n${result.reason}";
         } else {
-          // AI가 카탈로그에 없는 ID를 줬을 때 (Hallucination 방지용 안내)
-          _resultText = "⚠️ AI가 목록에 없는 곡(ID: ${result.songId})을 추천했습니다.\n\n"
-                        "📝 AI의 추천 이유:\n${result.reason}\n\n"
-                        "(해결책: 프롬프트에 '주어진 목록 내에서만 추천하라'는 지시를 강화해야 합니다.)";
+          // AI가 카탈로그에 없는 ID를 줬을 때 (Hallucination 방지)
+          _resultText = "⚠️ Musiclog가 목록에 없는 곡(ID: ${result.songId})을 추천했습니다.\n\n"
+                        "📝 Musiclog의 추천 이유:\n${result.reason}";
         }
       });
     } catch (e) {
@@ -108,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                 controller: _controller,
                 maxLines: 5,
                 decoration: const InputDecoration(
-                  hintText: '여기에 일기를 입력하세요 (영문 문장 테스트 권장)...',
+                  hintText: '여기에 일기를 입력하세요...',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -140,7 +135,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.blueGrey.withOpacity(0.2)),
                 ),
-                child: SelectableText( // 결과 복사가 가능하도록 SelectableText 사용
+                child: SelectableText(
                   _resultText,
                   style: const TextStyle(fontSize: 16, height: 1.5),
                 ),

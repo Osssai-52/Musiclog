@@ -271,6 +271,7 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
         diaryEntryId: entry.id,
         recommendation: recommendation,
       );
+      await widget.recommendSongUseCase.markUsedIfNeeded(recommendation);
 
       await _clearDraft();
       if (!mounted) return;

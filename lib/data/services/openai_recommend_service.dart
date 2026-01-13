@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../domain/services/recommend_service.dart';
-import '../../domain/services/recommend_request.dart';
+import '../../domain/models/recommend_request.dart';
 import '../../domain/models/recommendation_result.dart';
 import '../../domain/models/song.dart';
 
@@ -104,7 +104,7 @@ class OpenAiRecommendService implements RecommendService {
     3. Choose one song from the list that best matches the inferred emotions and mood.
 
     [Response Rules]
-    - You must select a songId that exists in the provided song list only.
+    - IMPORTANT: You are prohibited from recommending songs outside the provided list. Even if a famous song fits the mood, if it is not in the list, you must not pick it. Check the list twice before answering.
     - Only one song is allowed.
     - If no suitable song can be selected, return "NONE" as the songId.
     - Mention the song title first, then provide the recommendation reason in Korean in 1–2 sentences.

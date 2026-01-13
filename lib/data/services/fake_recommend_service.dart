@@ -1,5 +1,5 @@
 import '../../domain/services/recommend_service.dart';
-import '../../domain/services/recommend_request.dart';
+import '../../domain/models/recommend_request.dart';
 import '../../domain/models/recommendation_result.dart';
 
 class FakeRecommendService implements RecommendService {

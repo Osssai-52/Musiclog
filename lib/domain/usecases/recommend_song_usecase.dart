@@ -5,7 +5,7 @@ import '../repositories/song_catalog_repository.dart';
 import '../repositories/used_songs_repository.dart';
 
 import '../services/recommend_service.dart';
-import '../services/recommend_request.dart';
+import '../models/recommend_request.dart';
 
 class RecommendSongUseCase {
     final RecommendService recommendService;
@@ -22,7 +22,7 @@ class RecommendSongUseCase {
         required String diaryEntryId,
         required String diaryText,
     }) async {
-        final catalog = await songCatalogRepository.getAll();
+        final catalog = await songCatalogRepository.getTopSongs();
         final excluded = await usedSongsRepository.getUsedSongIds();
 
         final result = await recommendService.recommend(

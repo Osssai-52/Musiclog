@@ -8,6 +8,7 @@ import 'package:musiclog/config/app_colors.dart';
 import 'package:musiclog/domain/repositories/diary_repository.dart';
 import 'package:musiclog/domain/repositories/song_catalog_repository.dart';
 import '../../domain/models/diary_entry.dart';
+import 'package:musiclog/di/app_dependencies.dart';
 
 class CalendarView extends StatefulWidget {
   final DiaryRepository diaryRepository;
@@ -159,6 +160,7 @@ class _CalendarViewState extends State<CalendarView> {
             builder: (context) => DiaryEditDialog(
               diaryRepository: widget.diaryRepository,
               songRepository: widget.songRepository,
+              recommendSongUseCase: dependencies.recommendSongUseCase,
               selectedDate: day,
             ),
           );

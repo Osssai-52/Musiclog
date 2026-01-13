@@ -7,15 +7,18 @@ import 'package:musiclog/config/app_colors.dart';
 import 'package:musiclog/views/widgets/diary_edit_dialog.dart';
 import 'package:musiclog/domain/models/diary_entry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:musiclog/di/app_dependencies.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferences.getInstance();
-  runApp(const MyApp());
+  final dependencies = AppDependencies();
+  runApp(MyApp(dependencies: dependencies));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final AppDependencies dependencies;
+  const MyApp({super.key, required this.dependencies});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -36,7 +39,7 @@ class _MyAppState extends State<MyApp> {
         DiaryListView(
             songRepository: songRepository, diaryRepository: diaryRepository),
         CalendarView(
-            songRepository: songRepository, diaryRepository: diaryRepository),
+            songRepository: songRepository, diaryRepository: diaryRepository, dependencies: widget.dependencies),
         const Placeholder(),
       ];
 
@@ -100,6 +103,7 @@ class _MyAppState extends State<MyApp> {
           DiaryEditDialog(
             diaryRepository: diaryRepository,
             songRepository: songRepository,
+            recommendSongUseCase: widget.dependencies.recommendSongUseCase,
             selectedDate: today,
           ),
     );

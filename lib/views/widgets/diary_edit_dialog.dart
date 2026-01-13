@@ -4,16 +4,19 @@ import 'package:musiclog/domain/repositories/diary_repository.dart';
 import 'package:musiclog/domain/repositories/song_catalog_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:musiclog/domain/usecases/recommend_song_usecase.dart';
 
 class DiaryEditDialog extends StatefulWidget {
   final DiaryRepository diaryRepository;
   final SongCatalogRepository songRepository;
+  final RecommendSongUseCase recommendSongUseCase;
   final DateTime selectedDate;
 
   const DiaryEditDialog({
     super.key,
     required this.diaryRepository,
     required this.songRepository,
+    required this.recommendSongUseCase,
     required this.selectedDate,
   });
 
@@ -248,19 +251,37 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
       _isSaving = true;
     });
 
+    final content = _contentController.text.trim();
+
     try {
-      await widget.diaryRepository.upsertForDate(
+      // 1) 일기 저장 (DiaryEntry를 반환한다고 가정)
+      final entry = await widget.diaryRepository.upsertForDate(
         date: widget.selectedDate,
-        content: _contentController.text.trim(),
+        content: content,
+      );
+
+      // 2) 추천 생성
+      final recommendation = await widget.recommendSongUseCase.execute(
+        diaryEntryId: entry.id,
+        diaryText: content,
+      );
+
+      // 3) 추천 결과를 일기에 붙여 저장
+      await widget.diaryRepository.attachRecommendation(
+        diaryEntryId: entry.id,
+        recommendation: recommendation,
       );
 
       await _clearDraft();
-
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('일기가 저장되었습니다.'),
+          content: Text(
+            recommendation.songId == 'NONE'
+                ? '일기가 저장되었습니다. (추천 곡 없음)'
+                : '일기가 저장되고 추천이 완료되었습니다.',
+          ),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -271,7 +292,7 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('저장 중 오류가 발생했습니다: $e'),
+          content: Text('저장/추천 중 오류: $e'),
           backgroundColor: Colors.red,
         ),
       );

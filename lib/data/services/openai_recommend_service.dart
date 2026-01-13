@@ -79,9 +79,12 @@ class OpenAiRecommendService implements RecommendService {
 
     [응답 규칙]
     - 반드시 하나의 노래만 선택
-    - songId는 목록에 있는 값만 사용
     - 이유는 한국어로 1~2문장
     - 아래 JSON 형식으로만 응답
+    - 위 목록에 없는 songId를 반환하면 시스템 오류가 발생한다
+    - 반드시 목록에 존재하는 songId 중 하나만 선택해라
+    - 선택할 수 없으면 "NONE"을 반환해라
+
 
     {
     "songId": "string",

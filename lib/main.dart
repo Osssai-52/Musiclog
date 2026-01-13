@@ -48,6 +48,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+<<<<<<< Updated upstream
       title: 'Music Log',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -154,9 +155,105 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
             )
+=======
+      title: 'Musiclog',
+      home: HomePage(dependencies: dependencies),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  final AppDependencies dependencies;
+
+  const HomePage({
+    super.key,
+    required this.dependencies,
+  });
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController _diaryController = TextEditingController();
+  bool loading = false;
+  String resultText = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Musiclog – GPT 추천 테스트'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: _diaryController,
+              maxLines: 6,
+              decoration: const InputDecoration(
+                hintText: '오늘의 일기를 입력하세요',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: loading ? null : _recommend,
+              child: const Text('노래 추천받기'),
+            ),
+            const SizedBox(height: 16),
+            if (loading)
+              const Center(child: CircularProgressIndicator()),
+            if (resultText.isNotEmpty)
+              Text(
+                resultText,
+                style: const TextStyle(fontSize: 16),
+              ),
+>>>>>>> Stashed changes
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _recommend() async {
+    setState(() {
+      loading = true;
+      resultText = '';
+    });
+
+    try {
+      final result =
+          await widget.dependencies.recommendSongUseCase.execute(
+        diaryEntryId: 'test-diary',
+        diaryText: _diaryController.text,
+      );
+
+      setState(() {
+        resultText = '''
+🎵 추천 결과
+
+songId: ${result.songId}
+이유: ${result.reason}
+감정: ${result.matchedLines.join(', ')}
+''';
+      });
+    } catch (e) {
+      setState(() {
+        resultText = '❌ 오류 발생\n$e';
+      });
+    } finally {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _diaryController.dispose();
+    super.dispose();
   }
 }

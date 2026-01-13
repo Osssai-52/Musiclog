@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:musiclog/data/dummy/diary.dart';
 import 'package:musiclog/data/dummy/song_catalog.dart';
 import 'package:musiclog/views/calendar_view.dart';
 import 'package:musiclog/views/list_view.dart';
 import 'package:musiclog/config/app_colors.dart';
 
-void main() {
+import 'package:musiclog/domain/models/diary_entry.dart';
+import 'package:musiclog/domain/models/recommendation_result.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(DiaryEntryAdapter());
+  Hive.registerAdapter(RecommendationResultAdapter());
+
+  await Hive.openBox<DiaryEntry>('diary');
+
   runApp(const MyApp());
 }
 

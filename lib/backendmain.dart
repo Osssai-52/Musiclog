@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
-import 'di/app_dependencies.dart';
-import 'domain/models/song.dart'; 
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+import 'di/app_dependencies.dart';
+import 'domain/models/song.dart';
+import 'domain/models/diary_entry.dart';
+import 'domain/models/recommendation_result.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Hive 초기화
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(DiaryEntryAdapter());
+  Hive.registerAdapter(RecommendationResultAdapter());
+
+  await Hive.openBox<DiaryEntry>('diary');
+
   final dependencies = AppDependencies();
   runApp(MyApp(dependencies: dependencies));
 }
@@ -45,30 +59,49 @@ class _HomePageState extends State<HomePage> {
     });
 
     try {
-      final result = await widget.dependencies.recommendSongUseCase.execute(
-        diaryEntryId: 'test-diary-${DateTime.now().millisecondsSinceEpoch}',
+      final now = DateTime.now();
+
+      final diaryEntry =
+          await widget.dependencies.diaryRepository.upsertForDate(
+        date: now,
+        content: _controller.text,
+      );
+
+      final result =
+          await widget.dependencies.recommendSongUseCase.execute(
+        diaryEntryId: diaryEntry.id,
         diaryText: _controller.text,
       );
 
-      final allSongs = await widget.dependencies.songCatalogRepository.getTopSongs();
+      await widget.dependencies.diaryRepository.attachRecommendation(
+        diaryEntryId: diaryEntry.id,
+        recommendation: result,
+      );
+
+      final allSongs =
+          await widget.dependencies.songCatalogRepository.getTopSongs();
 
       Song? recommendedSong;
       try {
-        recommendedSong = allSongs.firstWhere((s) => s.id == result.songId);
-      } catch (e) {
+        recommendedSong =
+            allSongs.firstWhere((s) => s.id == result.songId);
+      } catch (_) {
         recommendedSong = null;
       }
 
       setState(() {
         if (recommendedSong != null) {
-          _resultText = "🎵 추천 곡: ${recommendedSong.title}\n"
-                        "👤 아티스트: ${recommendedSong.artist}\n"
-                        "🆔 곡 ID: ${result.songId}\n\n"
-                        "📝 추천 이유:\n${result.reason}";
+          _resultText =
+              "🎵 추천 곡: ${recommendedSong.title}\n"
+              "👤 아티스트: ${recommendedSong.artist}\n"
+              "🆔 곡 ID: ${result.songId}\n\n"
+              "📝 추천 이유:\n${result.reason}\n\n"
+              "💾 일기 저장 완료";
         } else {
-          // AI가 카탈로그에 없는 ID를 줬을 때 (Hallucination 방지)
-          _resultText = "⚠️ Musiclog가 목록에 없는 곡(ID: ${result.songId})을 추천했습니다.\n\n"
-                        "📝 Musiclog의 추천 이유:\n${result.reason}";
+          _resultText =
+              "⚠️ 목록에 없는 곡(ID: ${result.songId}) 추천됨\n\n"
+              "📝 추천 이유:\n${result.reason}\n\n"
+              "💾 일기 저장 완료";
         }
       });
     } catch (e) {
@@ -86,7 +119,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Musiclog AI Test (With Catalog Check)'),
+        title: const Text('Musiclog AI Test (Save Enabled)'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -110,31 +143,15 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _isLoading ? null : _getRecommendation,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
                 child: _isLoading
-                    ? const SizedBox(
-                        height: 20, width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Text('AI 노래 추천받기'),
+                    ? const CircularProgressIndicator()
+                    : const Text('저장 + 노래 추천'),
               ),
               const SizedBox(height: 30),
               const Divider(thickness: 1),
               const SizedBox(height: 10),
-              const Text(
-                "추천 결과",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[50],
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.blueGrey.withOpacity(0.2)),
-                ),
                 child: SelectableText(
                   _resultText,
                   style: const TextStyle(fontSize: 16, height: 1.5),

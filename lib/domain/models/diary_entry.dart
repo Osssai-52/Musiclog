@@ -1,14 +1,29 @@
+import 'package:hive/hive.dart';
 import 'package:musiclog/domain/models/recommendation_result.dart';
 
+part 'diary_entry.g.dart';
+
+@HiveType(typeId: 1)
 class DiaryEntry {
-  final String id; //UUID
-  final DateTime date; // 로컬 기준 yyyy-mm-dd
-  final String content; //일기 본문
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
+  final DateTime date;
+
+  @HiveField(2)
+  final String content;
+
+  @HiveField(3)
   final DateTime createdAt;
+
+  @HiveField(4)
   final DateTime updatedAt;
 
-  // 추천 결과(확정된 곡)
+  @HiveField(5)
   final String? recommendedSongId;
+
+  @HiveField(6)
   final RecommendationResult? recommendation;
 
   DiaryEntry({

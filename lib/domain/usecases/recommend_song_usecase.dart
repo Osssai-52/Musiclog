@@ -22,7 +22,7 @@ class RecommendSongUseCase {
         required String diaryEntryId,
         required String diaryText,
     }) async {
-        final catalog = await songCatalogRepository.getAll();
+        final catalog = await songCatalogRepository.getTopSongs();
         final excluded = await usedSongsRepository.getUsedSongIds();
 
         final result = await recommendService.recommend(

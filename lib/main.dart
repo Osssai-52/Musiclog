@@ -4,8 +4,13 @@ import 'package:musiclog/data/dummy/song_catalog.dart';
 import 'package:musiclog/views/calendar_view.dart';
 import 'package:musiclog/views/list_view.dart';
 import 'package:musiclog/config/app_colors.dart';
+import 'package:musiclog/views/widgets/diary_edit_dialog.dart';
+import 'package:musiclog/domain/models/diary_entry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 
@@ -17,37 +22,113 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+
   int _selectedIndex = 0;
   late final songRepository = DummySongCatalogRepository();
   late final diaryRepository = DummyDiaryRepository();
-  final List<String> _tabTitles = ['List View', 'Calendar View', 'Settings'];
 
-  List<Widget> get _tabs => [
-    DiaryListView(songRepository: songRepository, diaryRepository: diaryRepository),
-    CalendarView(songRepository: songRepository, diaryRepository: diaryRepository),
-    const Placeholder(),
-  ];
+  bool _todayHasDiary = false;
+  bool _todayStatusLoading = true;
+
+  List<Widget> get _tabs =>
+      [
+        DiaryListView(
+            songRepository: songRepository, diaryRepository: diaryRepository),
+        CalendarView(
+            songRepository: songRepository, diaryRepository: diaryRepository),
+        const Placeholder(),
+      ];
 
   @override
   void initState() {
     super.initState();
     _initRepositories();
+    _refreshTodayStatus();
   }
 
   Future<void> _initRepositories() async {
     await songRepository.init();
-    setState(() {});
+    if (mounted) setState(() {});
+  }
+
+  int _dayKey(DateTime d) => d.year * 10000 + d.month * 100 + d.day;
+
+  Future<void> _refreshTodayStatus() async {
+    setState(() {
+      _todayStatusLoading = true;
+    });
+
+    try {
+      final List<DiaryEntry> entries = await diaryRepository.listAll();
+      final now = DateTime.now();
+      final todayKey = _dayKey(DateTime(now.year, now.month, now.day));
+
+      final has = entries.any((e) {
+        final d = e.date.toLocal();
+        final key = _dayKey(DateTime(d.year, d.month, d.day));
+        return key == todayKey;
+      });
+
+      if (!mounted) return;
+      setState(() {
+        _todayHasDiary = has;
+        _todayStatusLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _todayHasDiary = false;
+        _todayStatusLoading = false;
+      });
+    }
+  }
+
+  Future<void> _openTodayEdit() async {
+    final nav = _navKey.currentState;
+    if (nav == null) return;
+
+    final ctx = nav.overlay!.context;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final result = await showDialog<String>(
+      context: ctx,
+      useRootNavigator: true,
+      builder: (context) =>
+          DiaryEditDialog(
+            diaryRepository: diaryRepository,
+            songRepository: songRepository,
+            selectedDate: today,
+          ),
+    );
+
+    if (result == 'refresh') {
+      await _refreshTodayStatus();
+      if (mounted) setState(() {});
+    } else {
+      await _refreshTodayStatus();
+    }
   }
 
   void _switchTab(int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    if (index == 0) {
+      _refreshTodayStatus();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final showAdd = _selectedIndex == 0;
+    final addEnabled = showAdd && !_todayStatusLoading && !_todayHasDiary;
+
     return MaterialApp(
+      navigatorKey: _navKey,
       title: 'Music Log',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -79,8 +160,14 @@ class _MyAppState extends State<MyApp> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: AppBar(
+              leading: showAdd
+                  ? IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: addEnabled ? _openTodayEdit : null,
+              )
+                  : null,
               actions: [
-                IconButton(onPressed: null, icon: const Icon(Icons.light_mode))
+                IconButton(onPressed: null, icon: const Icon(Icons.light_mode)),
               ],
               scrolledUnderElevation: 0,
               backgroundColor: AppColors.background,
@@ -92,11 +179,11 @@ class _MyAppState extends State<MyApp> {
         body: Stack(
           children: [
             AnimatedSwitcher(
-              duration: Duration(milliseconds: 250),
+              duration: const Duration(milliseconds: 250),
               transitionBuilder: (child, animation) =>
                   FadeTransition(opacity: animation, child: child),
               child: _tabs[_selectedIndex],
-              key: ValueKey(_selectedIndex),  // 필수!
+              key: ValueKey(_selectedIndex),
             ),
             Positioned(
               bottom: 0,
@@ -133,7 +220,8 @@ class _MyAppState extends State<MyApp> {
                     GestureDetector(
                       onTap: () => _switchTab(1),
                       child: Icon(
-                        _selectedIndex == 1 ? Icons.album : Icons.album_outlined,
+                        _selectedIndex == 1 ? Icons.album : Icons
+                            .album_outlined,
                         color: _selectedIndex == 1
                             ? AppColors.primary
                             : AppColors.textSecondary,
@@ -143,7 +231,8 @@ class _MyAppState extends State<MyApp> {
                     GestureDetector(
                       onTap: () => _switchTab(2),
                       child: Icon(
-                        _selectedIndex == 2 ? Icons.settings : Icons.settings_outlined,
+                        _selectedIndex == 2 ? Icons.settings : Icons
+                            .settings_outlined,
                         color: _selectedIndex == 2
                             ? AppColors.primary
                             : AppColors.textSecondary,
@@ -153,7 +242,7 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

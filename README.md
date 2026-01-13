@@ -1,6 +1,6 @@
-# musiclog
+# Musiclog
 
-musiclog
+Musiclog
 
 ## Getting Started
 

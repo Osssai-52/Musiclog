@@ -1,15 +1,7 @@
-<table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td style="border: none; padding-right: 12px;">
-      <img src="./assets/logo.png" width="70" />
-    </td>
-    <td style="border: none;">
-      <h1>Musiclog</h1>
-    </td>
-  </tr>
-</table>
-
-
+<div style="display: flex; align-items: center;">
+  <img src="./assets/logo.png" width="70" style="margin-right: 12px;" />
+  <h1 style="margin: 0;">Musiclog</h1>
+</div>
 
 > **오늘의 기분에 가장 어울리는 음악 한 곡을 추천하는 감정 기반 음악 앱**
 

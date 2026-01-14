@@ -1,13 +1,14 @@
-<table>
+<table border="0" cellspacing="0" cellpadding="0">
   <tr>
-    <td>
-      <img src="./assets/logo.png" width="80" />
+    <td style="border: none; padding-right: 12px;">
+      <img src="./assets/logo.png" width="70" />
     </td>
-    <td>
+    <td style="border: none;">
       <h1>Musiclog</h1>
     </td>
   </tr>
 </table>
+
 
 
 > **오늘의 기분에 가장 어울리는 음악 한 곡을 추천하는 감정 기반 음악 앱**
@@ -42,8 +43,8 @@
 - 날짜 기준으로 정렬된 일기 목록 제공
 - 각 일기 카드에 작성 날짜, 일기 내용 미리보기, 추천 음악 정보 표시
 
-### 📅 달력 UI 지원
-- 일기를 달력 형태의 UI로 시각화
+### 📅 캘린더 UI 지원
+- 일기를 캘린더 형태의 UI로 시각화
 - 각 날짜에는 해당 일기에 연결된 앨범 커버 이미지 표시
 - 날짜별로 저장된 기록을 한눈에 확인 가능
 

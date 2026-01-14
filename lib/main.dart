@@ -23,17 +23,14 @@ import 'package:musiclog/views/list_view.dart';
 import 'package:musiclog/views/settings_view.dart';
 import 'package:musiclog/views/widgets/diary_edit_dialog.dart';
 
-// ✅ Hive Models (Adapter 필요)
 import 'package:musiclog/domain/models/diary_entry.dart';
 import 'package:musiclog/domain/models/recommendation_result.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Hive init
   await Hive.initFlutter();
 
-  // ✅ Adapter 등록
   // (이미 등록되어 있으면 에러 날 수 있으니 안전하게 처리)
   if (!Hive.isAdapterRegistered(DiaryEntryAdapter().typeId)) {
     Hive.registerAdapter(DiaryEntryAdapter());
@@ -41,8 +38,6 @@ Future<void> main() async {
   if (!Hive.isAdapterRegistered(RecommendationResultAdapter().typeId)) {
     Hive.registerAdapter(RecommendationResultAdapter());
   }
-
-  // ✅ Box open
   await Hive.openBox<DiaryEntry>('diary');
 
   await SharedPreferences.getInstance();

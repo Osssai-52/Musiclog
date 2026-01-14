@@ -100,9 +100,8 @@
 ## 📥 APK 다운로드
 
 <!-- APK 파일 직접 업로드 또는 구글 드라이브 링크 -->
-📦 [APK 다운로드 (Google Drive)](https://drive.google.com/your-apk-link)
 
-또는 [Releases](https://github.com/Osssai-52/Musiclog/releases) 페이지에서 최신 버전을 다운로드하세요.
+[Releases](https://github.com/Osssai-52/Musiclog/releases) 페이지에서 최신 버전을 다운로드하세요.
 
 ---
 

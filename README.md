@@ -1,42 +1,56 @@
-<p align="center">
-  <img src="./assets/logo.png" width="120" />
-</p>
+<table>
+  <tr>
+    <td>
+      <img src="./assets/logo.png" width="80" />
+    </td>
+    <td>
+      <h1>Musiclog</h1>
+    </td>
+  </tr>
+</table>
 
-<h1 align="center">Musiclog</h1>
 
-> **오늘의 감정을 기록하면, AI가 당신에게 어울리는 노래를 추천해드립니다.**
+> **오늘의 기분에 가장 어울리는 음악 한 곡을 추천하는 감정 기반 음악 앱**
 
-Musiclog는 일기와 음악을 연결하는 Flutter 기반 모바일 앱입니다. 매일의 감정과 생각을 일기로 기록하면, AI가 당신의 글을 분석하여 그 순간에 딱 맞는 노래를 추천해줍니다.
+일기는 시간이 지나며 감정과 분위기를 그대로 재현이 어렵다. 이에 Musiclog는 일기 작성 시점의 탑100 음악을 함께 저장하여 텍스트 기록에 시간 맥락을 부여하고 기억 회상을 강화한다.
+
+---
+
+## 👥 팀원
+
+| 이름 | 역할 |
+|------|------|
+| **[최서영](https://github.com/Osssai-52)** | Backend, AI 추천 시스템, 데이터 관리 |
+| **[박지민](https://github.com/xistoh162108)** | Frontend, UI/UX |
 
 ---
 
 ## ✨ 주요 기능
 
-### 📝 일기 작성
-- 매일의 감정과 생각을 자유롭게 기록
-- 임시 저장(Draft) 기능으로 작성 중인 일기 보존
-- 날짜별 일기 관리
+### 📝 일기 작성 및 저장
+- 사용자가 날짜별로 그날의 일기 작성
+- 작성된 일기는 기기 내부에 로컬 저장
+- 하루 단위로 일기 관리 가능
 
-### 🎧 AI 노래 추천
-- OpenAI Embeddings를 활용한 의미론적 텍스트 분석
-- 일기 내용과 노래 가사의 코사인 유사도 계산
-- 당신의 감정에 가장 어울리는 노래를 자동 추천
-- 추천 이유와 매칭된 가사 확인 가능
+### 🎧 시점 기반 음악 데이터 연동 및 추천
+- 일기 작성 시점의 탑100 음악 데이터 연결
+- 일기 텍스트를 분석하여 분위기와 감정 파악
+- 일기 내용과 어울리는 음악 추천
+- 해당 시점의 음악 트렌드를 일기와 함께 기록
 
-### 📅 캘린더 뷰
-- 달력 형태로 일기 기록 한눈에 확인
-- 추천된 노래의 앨범 커버로 날짜 표시
-- 날짜 클릭 시 일기 상세 보기
+### 📋 일기 리스트 조회
+- 날짜 기준으로 정렬된 일기 목록 제공
+- 각 일기 카드에 작성 날짜, 일기 내용 미리보기, 추천 음악 정보 표시
 
-### 📋 리스트 뷰
-- 월별로 그룹화된 일기 목록
-- 빠른 검색 및 탐색
+### 📅 달력 UI 지원
+- 일기를 달력 형태의 UI로 시각화
+- 각 날짜에는 해당 일기에 연결된 앨범 커버 이미지 표시
+- 날짜별로 저장된 기록을 한눈에 확인 가능
 
-### 📊 인사이트 (통계)
-- 일기 작성 연속 기록(Streak) 확인
-- 요일별 작성 패턴 분석
-- 가장 많이 추천된 노래/아티스트 순위
-- 월별 작성 추이 그래프
+### 📊 기록 통계 (Insights)
+- 월별/주별 일기 작성 개수 통계 제공
+- 사용자가 가장 많이 기록한 기간 확인 가능
+- Top Artist: 일기와 함께 가장 많이 등장한 아티스트 분석
 
 ### ⚙️ 설정
 - 🌓 다크/라이트 모드 전환
@@ -58,25 +72,21 @@ Musiclog는 일기와 음악을 연결하는 Flutter 기반 모바일 앱입니�
 | **UI** | Material Design 3, Custom Theme System |
 | **기타** | table_calendar, shared_preferences, share_plus |
 
+![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white)
+![Apple Music](https://img.shields.io/badge/Apple%20Music-FA243C?logo=applemusic&logoColor=white)
+![Hive](https://img.shields.io/badge/Hive-FFC107?logo=hive&logoColor=black)
+
 ---
 
 ## 📱 페이지별 기능
 
 | 페이지 | 기능 |
 |--------|------|
-| **홈 (캘린더)** | 달력에서 일기 작성 및 조회, 오늘 일기 작성 버튼 |
-| **리스트** | 월별 일기 목록, 상세 보기 |
-| **설정** | 내보내기, 인사이트, 테마 설정, 데이터 관리 |
-| **인사이트** | 통계 대시보드, 작성 패턴 분석 |
+| **일기 작성 & 리스트 뷰** | 일기 작성 및 조회, 추천 음악 확인 |
+| **캘린더 뷰** | 월별 일기 목록, 상세 보기 |
+| **Settings** | 데이터 내보내기, 기록 통계, 화면 설정, 기록 관리 |
 
----
-
-## 👥 팀원
-
-| 이름 | 역할 |
-|------|------|
-| **최서영** | Backend, AI 추천 시스템, 데이터 관리 |
-| **박지민** | Frontend, UI/UX |
 
 ---
 
@@ -171,8 +181,3 @@ lib/
 
 This project is licensed under the MIT License.
 
----
-
-<p align="center">
-  Made with ❤️ at <strong>KAIST 몰입캠프 2025 Winter</strong>
-</p>

@@ -22,17 +22,16 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Settings',
-            style: TextStyle(
-              fontFamily: 'Nanum',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.appColors.textPrimary,
             ),
           ),
           const SizedBox(height: 12),
@@ -131,24 +130,24 @@ class _ActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseColor = disabled
-        ? AppColors.surfaceVariant
-        : (danger ? AppColors.error.withOpacity(0.08) : AppColors.surface);
+        ? context.appColors.surfaceVariant
+        : (danger ? context.appColors.error.withOpacity(0.08) : context.appColors.surface);
 
     final borderColor = disabled
-        ? AppColors.border.withOpacity(0.6)
-        : (danger ? AppColors.error.withOpacity(0.35) : AppColors.border);
+        ? context.appColors.border.withOpacity(0.6)
+        : (danger ? context.appColors.error.withOpacity(0.35) : context.appColors.border);
 
     final titleColor = disabled
-        ? AppColors.textSecondary.withOpacity(0.7)
-        : (danger ? AppColors.error : AppColors.textPrimary);
+        ? context.appColors.textSecondary.withOpacity(0.7)
+        : (danger ? context.appColors.error : context.appColors.textPrimary);
 
     final subtitleColor = disabled
-        ? AppColors.textSecondary.withOpacity(0.55)
-        : AppColors.textSecondary;
+        ? context.appColors.textSecondary.withOpacity(0.55)
+        : context.appColors.textSecondary;
 
     final iconColor = disabled
-        ? AppColors.textSecondary.withOpacity(0.55)
-        : (danger ? AppColors.error : AppColors.primary);
+        ? context.appColors.textSecondary.withOpacity(0.55)
+        : (danger ? context.appColors.error : context.appColors.primary);
 
     return InkWell(
       onTap: disabled ? null : onTap,
@@ -163,7 +162,7 @@ class _ActionCard extends StatelessWidget {
               ? null
               : [
             BoxShadow(
-              color: AppColors.shadow.withOpacity(0.06),
+              color: context.appColors.shadow.withOpacity(0.06),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -178,8 +177,7 @@ class _ActionCard extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'Nanum',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: titleColor,
@@ -190,8 +188,7 @@ class _ActionCard extends StatelessWidget {
               subtitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontFamily: 'Nanum',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 13,
                 height: 1.25,
                 color: subtitleColor,

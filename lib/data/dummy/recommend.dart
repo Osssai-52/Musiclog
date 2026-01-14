@@ -68,7 +68,7 @@ class _CalendarViewState extends State<CalendarView> {
                 height: 40,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primary,
+                  color: context.appColors.primary,
                 ),
                 child: const Center(
                   child: SizedBox(
@@ -105,13 +105,12 @@ class _CalendarViewState extends State<CalendarView> {
                           height: 40,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary,
+                            color: context.appColors.primary,
                           ),
                           child: Center(
                             child: Text(
                               '${day.day}',
-                              style: const TextStyle(
-                                fontFamily: "Nanum",
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -131,13 +130,12 @@ class _CalendarViewState extends State<CalendarView> {
               height: 40,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary,
+                color: context.appColors.primary,
               ),
               child: Center(
                 child: Text(
                   '${day.day}',
-                  style: const TextStyle(
-                    fontFamily: "Nanum",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -176,8 +174,8 @@ class _CalendarViewState extends State<CalendarView> {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primary.withOpacity(0.4),
-            border: Border.all(color: AppColors.primary, width: 2),
+            color: context.appColors.primary.withOpacity(0.4),
+            border: Border.all(color: context.appColors.primary, width: 2),
           ),
           child: const Icon(
             Icons.edit,
@@ -193,8 +191,7 @@ class _CalendarViewState extends State<CalendarView> {
     return Center(
       child: Text(
         '${day.day}',
-        style: const TextStyle(
-          fontFamily: "Nanum",
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: 16,
           fontWeight: FontWeight.bold,
         ),
@@ -219,24 +216,22 @@ class _CalendarViewState extends State<CalendarView> {
                       '${_focusedDay.year}',
                       maxLines: 1,
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                        height: 1.2,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 25,
+                        height: 1.2,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Nanum',
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                     ),
                     Text(
                       DateFormat('MMMM').format(_focusedDay),
                       maxLines: 1,
                       textAlign: TextAlign.left,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         height: 0.9,
                         fontSize: 50,
                         fontWeight: FontWeight.normal,
-                        fontFamily: 'Nanum',
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                     ),
                   ],
@@ -320,11 +315,10 @@ class _CalendarViewState extends State<CalendarView> {
                       return Center(
                         child: Text(
                           text,
-                          style: const TextStyle(
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            fontFamily: "Nanum",
-                            color: AppColors.textSecondary,
+                            color: context.appColors.textSecondary,
                           ),
                         ),
                       );
@@ -339,36 +333,36 @@ class _CalendarViewState extends State<CalendarView> {
                   enabledDayPredicate: (day) {
                     return !day.isAfter(DateTime(now.year, now.month, now.day));
                   },
-                  calendarStyle: CalendarStyle(
-                    disabledTextStyle: TextStyle(
-                      color: AppColors.textHint,
-                      fontFamily: "Nanum",
-                      fontSize: 20,
-                    ),
-                    defaultTextStyle: TextStyle(
-                      fontFamily: "Nanum",
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                    weekendTextStyle: TextStyle(
-                      fontFamily: "Nanum",
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                    selectedTextStyle: TextStyle(
-                      fontFamily: "Nanum",
-                      color: AppColors.primary,
-                    ),
-                    todayTextStyle: TextStyle(
-                      fontFamily: "Nanum",
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                    outsideDaysVisible: false,
+                    final t = Theme.of(context).textTheme;
+
+                calendarStyle: CalendarStyle(
+                  disabledTextStyle: (t.bodyLarge ?? const TextStyle()).copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: context.appColors.textHint,
                   ),
+                  defaultTextStyle: (t.bodyLarge ?? const TextStyle()).copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: context.appColors.textPrimary,
+                  ),
+                  weekendTextStyle: (t.bodyLarge ?? const TextStyle()).copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: context.appColors.textPrimary,
+                  ),
+                  selectedTextStyle: (t.bodyLarge ?? const TextStyle()).copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: context.appColors.primary,
+                  ),
+                  todayTextStyle: (t.bodyLarge ?? const TextStyle()).copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: context.appColors.primary, // AppColors.primary 말고 context.appColors.primary로 통일
+                  ),
+                  outsideDaysVisible: false,
+                ),
                 );
               },
             ),

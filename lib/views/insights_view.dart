@@ -4,6 +4,7 @@ import 'package:musiclog/domain/models/diary_entry.dart';
 import 'package:musiclog/domain/models/song.dart';
 import 'package:musiclog/domain/repositories/diary_repository.dart';
 import 'package:musiclog/domain/repositories/song_catalog_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InsightsView extends StatefulWidget {
   final DiaryRepository diaryRepository;
@@ -147,7 +148,7 @@ class _InsightsViewState extends State<InsightsView> {
 
       final rec = e.recommendation;
       if (rec != null) {
-        sumConf += rec.confidence;
+        sumConf += (rec.confidence ?? 0.0);
         confCount += 1;
 
         final sid = rec.songId;
@@ -192,18 +193,26 @@ class _InsightsViewState extends State<InsightsView> {
     );
   }
 
-  Map<String, int> _lastMonths(Map<String, int> monthCounts, {required int months}) {
+  Map<String, int> _lastMonths(
+      Map<String, int> monthCounts, {
+        required int months,
+      }) {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, 1);
 
-    final keys = <String>[];
-    DateTime cursor = start;
-    for (int i = 0; i < months; i++) {
-      final k = _ymKey(cursor);
-      keys.add(k);
-      cursor = DateTime(cursor.year, cursor.month - 1, 1);
+    DateTime addMonths(DateTime d, int delta) {
+      final m = d.month + delta;
+      final y = d.year + ((m - 1) ~/ 12);
+      final nm = ((m - 1) % 12) + 1;
+      return DateTime(y, nm, 1);
     }
-    keys.reverse();
+
+    final keys = <String>[];
+    var cursor = start;
+    for (int i = 0; i < months; i++) {
+      keys.add(_ymKey(cursor));
+      cursor = addMonths(cursor, -1);
+    }
 
     final res = <String, int>{};
     for (final k in keys) {
@@ -216,13 +225,13 @@ class _InsightsViewState extends State<InsightsView> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         appBar: AppBar(
           title: Text(
             'Insights',
-            style: TextStyle(
-              fontFamily: 'Nanum',
-              color: AppColors.textPrimary,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.appColors.textPrimary,
             ),
           ),
         ),
@@ -232,22 +241,20 @@ class _InsightsViewState extends State<InsightsView> {
 
     if (_error != null) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         appBar: AppBar(
           title: Text(
             'Insights',
-            style: TextStyle(
-              fontFamily: 'Nanum',
-              color: AppColors.textPrimary,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: context.appColors.textPrimary,
             ),
           ),
         ),
         body: Center(
           child: Text(
             _error!,
-            style: TextStyle(
-              fontFamily: 'Nanum',
-              color: AppColors.textPrimary,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: context.appColors.textPrimary,
             ),
           ),
         ),
@@ -266,13 +273,12 @@ class _InsightsViewState extends State<InsightsView> {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
         title: Text(
           'Insights',
-          style: TextStyle(
-            fontFamily: 'Nanum',
-            color: AppColors.textPrimary,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: context.appColors.textPrimary,
           ),
         ),
       ),
@@ -309,20 +315,6 @@ class _InsightsViewState extends State<InsightsView> {
                   bars: weekdayBars
                       .map((e) => _Bar(label: e.key, value: e.value.toDouble()))
                       .toList(),
-                ),
-              ),
-              const SizedBox(height: 14),
-              _ChartCard(
-                title: 'Top Songs',
-                subtitle: 'Most recommended',
-                child: _RankList(
-                  items: _topSongs.map((e) {
-                    final song = _songById[e.key];
-                    final label = song == null
-                        ? e.key
-                        : '${song.title} · ${song.artist}';
-                    return MapEntry(label, e.value);
-                  }).toList(),
                 ),
               ),
               const SizedBox(height: 14),
@@ -415,7 +407,7 @@ class _StatsGrid extends StatelessWidget {
           crossAxisCount: crossAxisCount,
           crossAxisSpacing: 14,
           mainAxisSpacing: 14,
-          childAspectRatio: w >= 600 ? 1.7 : 1.35,
+          childAspectRatio: w >= 600 ? 1.6 : 1.25,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: cards,
@@ -443,12 +435,12 @@ class _MetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.06),
+            color: context.appColors.shadow.withOpacity(0.06),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -460,44 +452,49 @@ class _MetricCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
+              color: context.appColors.primary.withOpacity(0.12),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: AppColors.primary),
+            child: Icon(icon, color: context.appColors.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontFamily: 'Nanum',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.bold,
+                    color: context.appColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontFamily: 'Nanum',
-                    fontSize: 22,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: context.appColors.textPrimary,
+                    ),
                   ),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: TextStyle(
-                      fontFamily: 'Nanum',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.appColors.textSecondary,
                     ),
                   ),
                 ],
@@ -527,12 +524,12 @@ class _ChartCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.appColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.appColors.border),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.06),
+            color: context.appColors.shadow.withOpacity(0.06),
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -543,20 +540,19 @@ class _ChartCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontFamily: 'Nanum',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.appColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(
-              fontFamily: 'Nanum',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              fontWeight: FontWeight.bold,
+              color: context.appColors.textSecondary,
             ),
           ),
           const SizedBox(height: 12),
@@ -605,7 +601,7 @@ class _BarChart extends StatelessWidget {
                         heightFactor: h,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.8),
+                            color: context.appColors.primary.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -615,11 +611,10 @@ class _BarChart extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     b.label,
-                    style: TextStyle(
-                      fontFamily: 'Nanum',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.bold,
+                      color: context.appColors.textSecondary,
                     ),
                   ),
                 ],
@@ -642,9 +637,8 @@ class _RankList extends StatelessWidget {
     if (items.isEmpty) {
       return Text(
         'No data',
-        style: TextStyle(
-          fontFamily: 'Nanum',
-          color: AppColors.textSecondary,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: context.appColors.textSecondary,
         ),
       );
     }
@@ -667,10 +661,9 @@ class _RankList extends StatelessWidget {
                 width: 22,
                 child: Text(
                   '$idx',
-                  style: TextStyle(
-                    fontFamily: 'Nanum',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textSecondary,
+                    color: context.appColors.textSecondary,
                   ),
                 ),
               ),
@@ -682,10 +675,9 @@ class _RankList extends StatelessWidget {
                       label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontFamily: 'Nanum',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: context.appColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -694,7 +686,7 @@ class _RankList extends StatelessWidget {
                         Container(
                           height: 10,
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
+                            color: context.appColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -703,7 +695,7 @@ class _RankList extends StatelessWidget {
                           child: Container(
                             height: 10,
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.8),
+                              color: context.appColors.primary.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
@@ -716,10 +708,9 @@ class _RankList extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 '$value',
-                style: TextStyle(
-                  fontFamily: 'Nanum',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                 ),
               ),
             ],

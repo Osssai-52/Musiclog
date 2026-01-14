@@ -135,11 +135,10 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                       Expanded(
                         child: Text(
                           DateFormat('MMMM d, yyyy').format(widget.selectedDate),
-                          style: TextStyle(
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Nanum',
-                            color: AppColors.textPrimary,
+                            color: context.appColors.textPrimary,
                           ),
                         ),
                       ),
@@ -154,11 +153,10 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                   const SizedBox(height: 16),
                   Text(
                     'What happened today?',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Nanum',
-                      color: AppColors.textSecondary,
+                      color: context.appColors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -168,22 +166,20 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                     minLines: 4,
                     decoration: InputDecoration(
                       hintText: '오늘 있었던 일, 기분, 생각 등을 자유롭게 적어보세요...',
-                      hintStyle: TextStyle(
-                        fontFamily: 'Nanum',
-                        color: AppColors.textSecondary.withOpacity(0.7),
+                      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: context.appColors.textSecondary.withOpacity(0.7),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: AppColors.surfaceVariant,
+                      fillColor: context.appColors.surfaceVariant,
                       contentPadding: const EdgeInsets.all(16),
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 16,
-                      fontFamily: 'Nanum',
-                      color: AppColors.textPrimary,
+                      color: context.appColors.textPrimary,
                       height: 1.6,
                     ),
                     validator: (value) {
@@ -199,7 +195,7 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                     child: ElevatedButton(
                       onPressed: _isSaving ? null : _saveDiary,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: context.appColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -215,12 +211,11 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                           valueColor: AlwaysStoppedAnimation(Colors.white),
                         ),
                       )
-                          : const Text(
+                          : Text(
                         'Save Diary',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Nanum',
                         ),
                       ),
                     ),
@@ -228,10 +223,9 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                   const SizedBox(height: 16),
                   Text(
                     DateFormat('MMM d, yyyy HH:mm').format(DateTime.now()),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 11,
-                      fontFamily: 'Nanum',
-                      color: AppColors.textSecondary,
+                      color: context.appColors.textSecondary,
                     ),
                     textAlign: TextAlign.right,
                   ),
@@ -283,7 +277,7 @@ class _DiaryEditDialogState extends State<DiaryEditDialog> {
                 ? '일기가 저장되었습니다. (추천 곡 없음)'
                 : '일기가 저장되고 추천이 완료되었습니다.',
           ),
-          backgroundColor: AppColors.primary,
+          backgroundColor: context.appColors.primary,
         ),
       );
 

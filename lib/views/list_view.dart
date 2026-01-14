@@ -48,7 +48,7 @@ class _DiaryListViewState extends State<DiaryListView> {
       final monthGroups = DiaryGrouper.groupByMonth(entries);
 
       return ListView.builder(
-        padding: EdgeInsets.only(bottom: 120),
+        padding: EdgeInsets.only(bottom: 16),
         itemCount: monthGroups.length,
         itemBuilder: (context, monthIndex) {
           final monthGroup = monthGroups[monthIndex];
@@ -66,11 +66,10 @@ class _DiaryListViewState extends State<DiaryListView> {
 
             title: Text(
               '${monthGroup.monthLabel} (${monthGroup.entries.length})',
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Nanum',
-                color: AppColors.textPrimary,              // ← 사용
+                color: context.appColors.textPrimary,
               ),
             ),
             children: [
@@ -83,28 +82,26 @@ class _DiaryListViewState extends State<DiaryListView> {
                   return Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Card(
-                      color: AppColors.surfaceVariant,    // ← 사용 (옅은 베이지)
+                      color: context.appColors.surfaceVariant,    // ← 사용 (옅은 베이지)
                       child: ListTile(
                         leading: CircleAvatar(
                           child: Text(
                             '${entry.date.day}',
-                            style: TextStyle(
-                              fontFamily: 'Nanum',
-                              fontWeight: FontWeight.bold,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontSize: 20,
+                              fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
-                          backgroundColor: AppColors.primary,  // ← 사용 (파스텔 블루)
+                          backgroundColor: context.appColors.primary,  // ← 사용 (파스텔 블루)
                         ),
                         title: Text(
                           entry.content.length > 30
                               ? '${entry.content.substring(0, 30)}...'
                               : entry.content,
-                          style: TextStyle(
-                            fontFamily: 'Nanum',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,      // ← 사용
+                            color: context.appColors.textPrimary,
                           ),
                         ),
                         subtitle: entry.recommendation != null
@@ -114,9 +111,8 @@ class _DiaryListViewState extends State<DiaryListView> {
                             if(songSnapshot.connectionState == ConnectionState.waiting){
                               return Text(
                                 'Loading Songs...',
-                                style: TextStyle(
-                                  fontFamily: 'Nanum',
-                                  color: AppColors.textSecondary,  // ← 사용
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: context.appColors.textSecondary,
                                 ),
                               );
                             }
@@ -125,33 +121,30 @@ class _DiaryListViewState extends State<DiaryListView> {
                               return Text(
                                 '🎵 ${song.title} - ${song.artist}',
                                 maxLines: 1,
-                                style: TextStyle(
-                                  fontFamily: 'Nanum',
-                                  color: AppColors.textSecondary,      // ← 사용 (살구색)
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
+                                  color: context.appColors.textSecondary,
                                 ),
                               );
                             }
                             return Text(
                               'Unable to find Songs',
-                              style: TextStyle(
-                                fontFamily: 'Nanum',
-                                color: AppColors.error,            // ← 사용
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: context.appColors.error,
                               ),
                             );
                           },
                         )
                             : Text(
                           '${entry.date.year} - ${entry.date.month.toString().padLeft(2, '0')} - ${entry.date.day.toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            fontFamily: 'Nanum',
-                            color: AppColors.textSecondary,       // ← 사용
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: context.appColors.textSecondary,
                           ),
                         ),
                         trailing: entry.recommendation != null
                             ? Icon(
                           Icons.music_note_rounded,
-                          color: AppColors.primary,              // ← 사용
+                          color: context.appColors.primary,              // ← 사용
                           size: 24,
                         )
                             : null,

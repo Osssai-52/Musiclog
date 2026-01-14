@@ -23,8 +23,9 @@ class UsedSongsRepositoryPrefs implements UsedSongsRepository {
       await prefs.setStringList(_key, list);
     }
   }
+  @override
   Future<void> clearAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_key);
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('used_song_ids');
   }
 }

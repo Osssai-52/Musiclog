@@ -70,4 +70,5 @@ class AppThemeController {
     await prefs.setString(_kFontFamily, fontFamily);
     notifier.value = notifier.value.copyWith(fontFamily: fontFamily);
   }
+
 }

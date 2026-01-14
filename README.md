@@ -62,13 +62,10 @@
 
 | 분류 | 기술 |
 |------|------|
-| **Framework** | Flutter 3.x, Dart |
-| **Local Database** | Hive |
-| **AI/ML** | OpenAI Embeddings API |
+| **Language** | Flutter (Dart) |
+| **Database** | Hive (NoSQL Local DB) |
+| **AI API** | OpenAI API |
 | **Music API** | Apple Music API |
-| **상태 관리** | ValueListenableBuilder, Provider Pattern |
-| **UI** | Material Design 3, Custom Theme System |
-| **기타** | table_calendar, shared_preferences, share_plus |
 
 ---
 

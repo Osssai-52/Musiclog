@@ -1,12 +1,75 @@
 import '../../domain/models/diary_entry.dart';
 import '../../domain/models/recommendation_result.dart';
 import '../../domain/repositories/diary_repository.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../domain/usecases/recommend_song_usecase.dart';
 
 class DummyDiaryRepository implements DiaryRepository {
   final List<DiaryEntry> _entries = [];
 
   DummyDiaryRepository() {
     _initializeDummyData();
+  }
+
+  Future<void> seedRecommendations(
+      RecommendSongUseCase useCase, {
+        bool force = false,
+      }) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    for (int i = 0; i < _entries.length; i++) {
+      final prev = _entries[i];
+
+      if (!force && prev.recommendation != null) {
+        await useCase.markUsedIfNeeded(prev.recommendation!);
+        continue;
+      }
+
+      final cacheKey = 'dummy_rec_${prev.id}';
+      RecommendationResult? rec;
+
+      if (!force) {
+        final cached = prefs.getString(cacheKey);
+        if (cached != null && cached.isNotEmpty) {
+          final m = jsonDecode(cached) as Map<String, dynamic>;
+          rec = RecommendationResult(
+            diaryEntryId: m['diaryEntryId'] as String,
+            songId: m['songId'] as String,
+            reason: m['reason'] as String,
+            matchedLines: (m['matchedLines'] as List).map((x) => x as String).toList(),
+            generatedAt: DateTime.parse(m['generatedAt'] as String),
+            model: m['model'] as String,
+            confidence: (m['confidence'] as num).toDouble(),
+          );
+        }
+      }
+
+      rec ??= await useCase.execute(
+        diaryEntryId: prev.id,
+        diaryText: prev.content,
+      );
+
+      await prefs.setString(
+        cacheKey,
+        jsonEncode({
+          'diaryEntryId': rec.diaryEntryId,
+          'songId': rec.songId,
+          'reason': rec.reason,
+          'matchedLines': rec.matchedLines,
+          'generatedAt': rec.generatedAt.toIso8601String(),
+          'model': rec.model,
+          'confidence': rec.confidence,
+        }),
+      );
+
+      await attachRecommendation(
+        diaryEntryId: prev.id,
+        recommendation: rec,
+      );
+
+      await useCase.markUsedIfNeeded(rec);
+    }
   }
 
   void _initializeDummyData() {

@@ -1,0 +1,308 @@
+import 'package:flutter/material.dart';
+import 'package:musiclog/config/app_colors.dart';
+import 'package:musiclog/domain/repositories/diary_repository.dart';
+import 'package:musiclog/domain/repositories/song_catalog_repository.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:musiclog/domain/usecases/recommend_song_usecase.dart';
+
+class DiaryEditDialog extends StatefulWidget {
+  final DiaryRepository diaryRepository;
+  final SongCatalogRepository songRepository;
+  final RecommendSongUseCase recommendSongUseCase;
+  final DateTime selectedDate;
+
+  const DiaryEditDialog({
+    super.key,
+    required this.diaryRepository,
+    required this.songRepository,
+    required this.recommendSongUseCase,
+    required this.selectedDate,
+  });
+
+  @override
+  State<DiaryEditDialog> createState() => _DiaryEditDialogState();
+}
+
+class _DiaryEditDialogState extends State<DiaryEditDialog> {
+  final _contentController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
+  bool _draftLoaded = false;
+
+  SharedPreferences? _prefs;
+
+  String get _draftKey {
+    final d = widget.selectedDate;
+    final key = d.year * 10000 + d.month * 100 + d.day;
+    return 'draft_$key';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDraft();
+  }
+
+  Future<void> _loadDraft() async {
+    try {
+      _prefs = await SharedPreferences.getInstance();
+      final draft = _prefs?.getString(_draftKey) ?? '';
+      if (!mounted) return;
+      _contentController.text = draft;
+    } catch (_) {
+      if (!mounted) return;
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _draftLoaded = true;
+      });
+    }
+  }
+
+  Future<void> _persistDraft() async {
+    if (_isSaving) return;
+
+    final text = _contentController.text.trim();
+    try {
+      _prefs ??= await SharedPreferences.getInstance();
+      if (_prefs == null) return;
+
+      if (text.isEmpty) {
+        await _prefs!.remove(_draftKey);
+      } else {
+        await _prefs!.setString(_draftKey, text);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _clearDraft() async {
+    try {
+      _prefs ??= await SharedPreferences.getInstance();
+      if (_prefs == null) return;
+      await _prefs!.remove(_draftKey);
+    } catch (_) {}
+  }
+
+  Future<void> _closeWithDraft() async {
+    await _persistDraft();
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_draftLoaded) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        insetPadding: const EdgeInsets.all(16),
+        child: const Padding(
+          padding: EdgeInsets.all(24.0),
+          child: SizedBox(
+            height: 120,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return WillPopScope(
+      onWillPop: () async {
+        await _persistDraft();
+        return true;
+      },
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        insetPadding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          DateFormat('MMMM d, yyyy').format(widget.selectedDate),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: context.appColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: _closeWithDraft,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'What happened today?',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: context.appColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _contentController,
+                    maxLines: 8,
+                    minLines: 4,
+                    decoration: InputDecoration(
+                      hintText: '오늘 있었던 일, 기분, 생각 등을 자유롭게 적어보세요...',
+                      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: context.appColors.textSecondary.withOpacity(0.7),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: context.appColors.surfaceVariant,
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 16,
+                      color: context.appColors.textPrimary,
+                      height: 1.6,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return '일기 내용을 작성해주세요.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isSaving ? null : _saveDiary,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: context.appColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isSaving
+                          ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(Colors.white),
+                        ),
+                      )
+                          : Text(
+                        'Save Diary',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    DateFormat('MMM d, yyyy HH:mm').format(DateTime.now()),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 11,
+                      color: context.appColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveDiary() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    final content = _contentController.text.trim();
+
+    try {
+      // 1) 일기 저장 (DiaryEntry를 반환한다고 가정)
+      final entry = await widget.diaryRepository.upsertForDate(
+        date: widget.selectedDate,
+        content: content,
+      );
+
+      // 2) 추천 생성
+      final recommendation = await widget.recommendSongUseCase.execute(
+        diaryEntryId: entry.id,
+        diaryText: content,
+      );
+
+      // 3) 추천 결과를 일기에 붙여 저장
+      await widget.diaryRepository.attachRecommendation(
+        diaryEntryId: entry.id,
+        recommendation: recommendation,
+      );
+      await widget.recommendSongUseCase.markUsedIfNeeded(recommendation);
+
+      await _clearDraft();
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            recommendation.songId == 'NONE'
+                ? '일기가 저장되었습니다. (추천 곡 없음)'
+                : '일기가 저장되고 추천이 완료되었습니다.',
+          ),
+          backgroundColor: context.appColors.primary,
+        ),
+      );
+
+      Navigator.pop(context, 'refresh');
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('저장/추천 중 오류: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _contentController.dispose();
+    super.dispose();
+  }
+}

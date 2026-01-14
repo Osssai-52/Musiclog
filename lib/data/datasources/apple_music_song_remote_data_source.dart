@@ -5,44 +5,38 @@ import '../dtos/song_dto.dart';
 import 'song_remote_data_source.dart';
 
 class AppleMusicSongRemoteDataSource implements SongRemoteDataSource {
-    static const _endpoint =
-        'https://appel-music-jwt-kax5-hat7qrert-xistoh162108s-projects.vercel.app/api';
+  static const String _baseUrl =
+      'https://appel-music-jwt-kax5-hat7qrert-xistoh162108s-projects.vercel.app/api';
 
-    @override
-    Future<List<SongDto>> fetchSongs() async {
-        final response = await http.get(
-        Uri.parse(_endpoint),
-        );
+  @override
+  Future<List<SongDto>> fetchTopSongs() async {
+    final response = await http.get(Uri.parse(_baseUrl));
 
-        if (response.statusCode != 200) {
-        throw Exception('Failed to fetch songs');
-        }
-
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        final List list = decoded['data'];
-
-        return list
-            .map((e) => SongDto.fromJson(e as Map<String, dynamic>))
-            .toList();
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch songs: ${response.statusCode}');
     }
 
-    // fetchTopSongs 메서드
-    @override
-    Future<List<SongDto>> fetchTopSongs() async {
-        // 만약 인기 차트 API 경로가 따로 있다면 주소 끝에 추가하세요 (예: '$_endpoint/top')
-        final response = await http.get(
-        Uri.parse(_endpoint), 
-        );
+    final dynamic json = jsonDecode(response.body);
 
-        if (response.statusCode != 200) {
-        throw Exception('Failed to fetch top songs');
-        }
-
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        final List list = decoded['data'];
-
-        return list
-            .map((e) => SongDto.fromJson(e as Map<String, dynamic>))
-            .toList();
+    List<dynamic> jsonList;
+    if (json is List) {
+      jsonList = json;
+    } else if (json is Map<String, dynamic>) {
+      if (json['data'] is List) {
+        jsonList = json['data'] as List<dynamic>;
+      } else if (json['songs'] is List) {
+        jsonList = json['songs'] as List<dynamic>;
+      } else if (json['results'] is List) {
+        jsonList = json['results'] as List<dynamic>;
+      } else {
+        throw Exception('Unknown API response format: ${response.body}');
+      }
+    } else {
+      throw Exception('Unexpected response type: ${response.body}');
     }
+
+    return jsonList
+        .map((item) => SongDto.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
 }

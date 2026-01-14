@@ -116,11 +116,10 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                 children: [
                   Text(
                     DateFormat('MMMM d, yyyy').format(widget.diaryEntry.date),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Nanum',
-                      color: AppColors.textPrimary,
+                      color: context.appColors.textPrimary,
                     ),
                   ),
                   IconButton(
@@ -134,26 +133,24 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
               const SizedBox(height: 16),
               Text(
                 'Content',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Nanum',
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
+                  color: context.appColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   widget.diaryEntry.content,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 16,
-                    fontFamily: 'Nanum',
-                    color: AppColors.textPrimary,
+                    color: context.appColors.textPrimary,
                     height: 1.6,
                   ),
                 ),
@@ -162,11 +159,10 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
               if (widget.diaryEntry.recommendation != null) ...[
                 Text(
                   'Recommended Song',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Nanum',
-                    color: AppColors.textSecondary,
+                    color: context.appColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -181,11 +177,11 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                       return Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
+                          color: context.appColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text('Unable to load song',
-                            style: TextStyle(color: AppColors.error)),
+                            style: TextStyle(color: context.appColors.error)),
                       );
                     }
 
@@ -198,10 +194,10 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
+                            color: context.appColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: AppColors.primary,
+                              color: context.appColors.primary,
                               width: 1,
                             ),
                           ),
@@ -209,7 +205,7 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceVariant,
+                                  color: context.appColors.surfaceVariant,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: GestureDetector(
@@ -239,11 +235,10 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                                       song.title,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        fontFamily: 'Nanum',
-                                        color: AppColors.textPrimary,
+                                        color: context.appColors.textPrimary,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -251,10 +246,9 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                                       song.artist,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                         fontSize: 12,
-                                        fontFamily: 'Nanum',
-                                        color: AppColors.textSecondary,
+                                        color: context.appColors.textSecondary,
                                       ),
                                     ),
                                   ],
@@ -280,7 +274,7 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                                         height: 44,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: AppColors.primary,
+                                          color: context.appColors.primary,
                                         ),
                                         child: Icon(
                                           isThisSongPlaying
@@ -300,30 +294,28 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                         const SizedBox(height: 12),
                         Text(
                           'Why this song?',
-                          style: TextStyle(
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Nanum',
-                            color: AppColors.textSecondary,
+                            color: context.appColors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
+                            color: context.appColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: AppColors.primary,
+                              color: context.appColors.primary,
                               width: 1,
                             ),
                           ),
                           child: Text(
                             recommendation.reason ?? 'No reason provided',
-                            style: TextStyle(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontSize: 14,
-                              fontFamily: 'Nanum',
-                              color: AppColors.textPrimary,
+                              color: context.appColors.textPrimary,
                               height: 1.6,
                             ),
                           ),
@@ -332,31 +324,29 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                         if (recommendation.matchedLines.isNotEmpty) ...[
                           Text(
                             'Matched Lyrics',
-                            style: TextStyle(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Nanum',
-                              color: AppColors.textSecondary,
+                              color: context.appColors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 6),
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceVariant,
+                              color: context.appColors.surfaceVariant,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: AppColors.primary,
+                                color: context.appColors.primary,
                                 width: 1,
                               ),
                             ),
                             child: Text(
                               recommendation.matchedLines.join('\n'),
-                              style: TextStyle(
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontSize: 14,
-                                fontFamily: 'Nanum',
-                                color: AppColors.textPrimary,
                                 height: 1.6,
+                                color: context.appColors.textPrimary,
                               ),
                             ),
                           ),
@@ -369,24 +359,22 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: context.appColors.surfaceVariant,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     'No song recommendation for this diary',
-                    style: TextStyle(
-                      fontFamily: 'Nanum',
-                      color: AppColors.textSecondary,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: context.appColors.textSecondary,
                     ),
                   ),
                 ),
               const SizedBox(height: 24),
               Text(
                 'Created: ${DateFormat('MMM d, yyyy HH:mm').format(widget.diaryEntry.createdAt)}',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: 11,
-                  fontFamily: 'Nanum',
-                  color: AppColors.textSecondary,
+                  color: context.appColors.textSecondary,
                 ),
               ),
             ],
@@ -401,7 +389,7 @@ class _DiaryDetailDialogState extends State<DiaryDetailDialog> {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: context.appColors.primary,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(Icons.music_note, color: Colors.white, size: 32),

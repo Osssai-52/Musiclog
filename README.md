@@ -1,4 +1,8 @@
-# 🎵 Musiclog
+<p align="center">
+  <img src="./assets/logo.png" width="120" />
+</p>
+
+<h1 align="center">Musiclog</h1>
 
 > **오늘의 감정을 기록하면, AI가 당신에게 어울리는 노래를 추천해드립니다.**
 

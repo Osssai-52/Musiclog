@@ -1,6 +1,13 @@
+![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white)
+![Apple Music](https://img.shields.io/badge/Apple%20Music-FA243C?logo=applemusic&logoColor=white)
+![Hive](https://img.shields.io/badge/Hive-FFC107?logo=hive&logoColor=black)
+
 <div style="display: flex; align-items: center;">
-  <img src="./assets/logo.png" width="70" style="margin-right: 12px;" />
-  <h1 style="margin: 0;">Musiclog</h1>
+  <img src="./assets/logo.png" width="70" />
+  <span style="font-size: 2.2em; font-weight: bold; margin-left: 12px;">
+    Musiclog
+  </span>
 </div>
 
 > **오늘의 기분에 가장 어울리는 음악 한 곡을 추천하는 감정 기반 음악 앱**
@@ -64,11 +71,6 @@
 | **상태 관리** | ValueListenableBuilder, Provider Pattern |
 | **UI** | Material Design 3, Custom Theme System |
 | **기타** | table_calendar, shared_preferences, share_plus |
-
-![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
-![OpenAI](https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white)
-![Apple Music](https://img.shields.io/badge/Apple%20Music-FA243C?logo=applemusic&logoColor=white)
-![Hive](https://img.shields.io/badge/Hive-FFC107?logo=hive&logoColor=black)
 
 ---
 

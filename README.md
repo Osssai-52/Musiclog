@@ -1,7 +1,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
+![Hive](https://img.shields.io/badge/Hive-FFC107?logo=hive&logoColor=black)
 ![OpenAI](https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white)
 ![Apple Music](https://img.shields.io/badge/Apple%20Music-FA243C?logo=applemusic&logoColor=white)
-![Hive](https://img.shields.io/badge/Hive-FFC107?logo=hive&logoColor=black)
 
 <div style="display: flex; align-items: center;">
   <img src="./assets/logo.png" width="70" style="margin-right: 12px;" />

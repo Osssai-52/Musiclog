@@ -5,7 +5,7 @@
 
 <div style="display: flex; align-items: center;">
   <img src="./assets/logo.png" width="70" />
-  <span style="font-size: 2.2em; font-weight: bold; margin-left: 12px;">
+  <span style="font-size: 15em; font-weight: bold; margin-left: 12px;">
     Musiclog
   </span>
 </div>
